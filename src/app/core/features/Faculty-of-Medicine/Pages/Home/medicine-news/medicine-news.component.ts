@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NewsService } from '../../../Services/news.service';
-import { NewsItem } from '../../../model/news.model';
+import { News } from '../../../model/news.model';
 
 @Component({
   selector: 'app-medicine-news',
@@ -17,8 +17,8 @@ export class MedicineNewsComponent implements OnInit {
   @Input() itemsPerView = 3;
   @Input() isRTL = true;
 
-  newsItems: NewsItem[] = [];
-  visibleItems: NewsItem[] = [];
+  newsItems: News[] = [];
+  visibleItems: News[] = [];
   currentStartIndex = 0;
 
   constructor(private newsService: NewsService) {}
@@ -27,7 +27,7 @@ export class MedicineNewsComponent implements OnInit {
     this.loadNews();
   }
 
-  trackByFn(index: number, item: NewsItem): any {
+  trackByFn(index: number, item: News): any {
     return item.id;
   }
 
@@ -85,11 +85,10 @@ export class MedicineNewsComponent implements OnInit {
   }
 
   getDateParts(dateString: string): { day: string; month: string } {
-    // Simple date parsing - in a real app, use proper date libraries
-    const parts = dateString.split(' ');
+    const date = new Date(dateString);
     return {
-      day: parts[0] || '',
-      month: parts[1] || ''
+      day: date.getDate().toString(),
+      month: date.toLocaleString('ar-EG', { month: 'short' })
     };
   }
 

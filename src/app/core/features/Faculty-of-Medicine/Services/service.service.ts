@@ -8,7 +8,7 @@ import { Observable, of } from 'rxjs';
 export class ServiceService {
   private services: Service[] = [
     {
-      id: 1,
+      id: '1',
       title: 'العيادات الخارجية',
       description: 'خدمات طبية متخصصة في جميع التخصصات الطبية بأحدث المعايير العالمية.',
       category: 'الخدمات الطبية',
@@ -17,7 +17,7 @@ export class ServiceService {
       url: '/services/outpatient-clinics'
     },
     {
-      id: 2,
+      id: '2',
       title: 'المختبرات الطبية',
       description: 'تحاليل طبية شاملة ودقيقة باستخدام أحدث التقنيات والأجهزة المتطورة.',
       category: 'التحاليل الطبية',
@@ -26,7 +26,7 @@ export class ServiceService {
       url: '/services/medical-laboratories'
     },
     {
-      id: 3,
+      id: '3',
       title: 'الأشعة التشخيصية',
       description: 'خدمات الأشعة والتصوير الطبي بأحدث أجهزة الرنين المغناطيسي والأشعة المقطعية.',
       category: 'التصوير الطبي',
@@ -41,7 +41,7 @@ export class ServiceService {
     return of(this.services);
   }
 
-  getById(id: number): Observable<Service | undefined> {
+  getById(id: string): Observable<Service | undefined> {
     return of(this.services.find(service => service.id === id));
   }
 

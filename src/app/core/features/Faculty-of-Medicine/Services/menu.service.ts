@@ -16,31 +16,33 @@ export class MenuService {
     {
       id: 2,
       title: 'عن الكلية',
+                target: '/about',
+
       isActive: false,
       type: 'menu',
       childs: [
         {
           id: 21,
           title: 'رؤية ورسالة الكلية',
-          target: '/about/vision',
+          target: '/about/1',
           isActive: false
         },
         {
           id: 22,
           title: 'تاريخ الكلية',
-          target: '/about/history',
+          target: '/about/2',
           isActive: false
         },
         {
           id: 23,
           title: 'اهداف الكلية',
-          target: '/about/administration',
+          target: '/about/3',
           isActive: false
         },
         {
           id: 24,
           title: 'الهيكل التنظيمي',
-          target: '/about/structure',
+          target: '/about/4',
           isActive: false
         }
       ]
@@ -51,36 +53,34 @@ export class MenuService {
       isActive: false,
       type: 'menu',
       childs: [
-     
-        
-            {
-              id: 321,
-              title: 'التشريح',
-              target: '/departments/anatomy',
-              isActive: false
-            },
-            {
-              id: 322,
-              title: 'الفسيولوجيا',
-              target: '/departments/physiology',
-              isActive: false
-            },
-            {
-              id: 323,
-              title: 'علم الأدوية',
-              target: '/departments/pharmacology',
-              isActive: false
-            },
-            {
-              id: 324,
-              title: 'علم الأمراض',
-              target: '/departments/pathology',
-              isActive: false
-            }
-          ]
+        {
+          id: 321,
+          title: 'التشريح',
+          target: '/departments/1',
+          isActive: false
         },
-    
-{      id: 31,
+        {
+          id: 322,
+          title: 'الفسيولوجيا',
+          target: '/departments/2',
+          isActive: false
+        },
+        {
+          id: 323,
+          title: 'علم الأدوية',
+          target: '/departments/3',
+          isActive: false
+        },
+        {
+          id: 324,
+          title: 'علم الأمراض',
+          target: '/departments/pathology',
+          isActive: false
+        }
+      ]
+    },
+    {
+      id: 31,
       title: 'البرامج',
       isActive: false,
       type: 'menu',
@@ -88,17 +88,18 @@ export class MenuService {
         {
           id: 311,
           title: 'الطب العام',
-          target: '/programs/general',
+          target: '/programs/1',
           isActive: false
         },
         {
           id: 312,
           title: 'الطب التخصصي',
-          target: '/programs/specialized',
+          target: '/programs/2',
           isActive: false
         }
       ]
-    },{
+    },
+    {
       id: 4,
       title: 'القطاعات',
       isActive: false,
@@ -106,20 +107,20 @@ export class MenuService {
       childs: [
         {
           id: 41,
-          title: ' قطاع شؤون التعليم والطلاب',
-          target: '/research/projects',
+          title: 'قطاع شؤون التعليم والطلاب',
+          target: '/sectors/1',
           isActive: false
         },
         {
           id: 42,
-          title: ' قطاع الدراسات العليا والبحوث',
-          target: '/research/conferences',
+          title: 'قطاع الدراسات العليا والبحوث',
+          target: '/sectors/2',
           isActive: false
         },
         {
           id: 43,
           title: 'قطاع خدمة المجتمع وتنمية البيئة',
-          target: '/research/journals',
+          target: '/sectors/3',
           isActive: false
         }
       ]
@@ -133,16 +134,15 @@ export class MenuService {
         {
           id: 51,
           title: 'مركز التعليم الطبي المستمر',
-          target: '/students/guide',
+          target: '/centers/education',
           isActive: false
         },
         {
           id: 52,
           title: 'مركز البحوث الطبية والتجارب المعملية',
-          target: '/students/results',
+          target: '/centers/research',
           isActive: false
-        },
-       
+        }
       ]
     },
     {
@@ -152,18 +152,17 @@ export class MenuService {
       type: 'menu',
       childs: [
         {
-          id: 51,
+          id: 91,
           title: 'وحدة ضمان الجودة والاعتماد',
-          target: '/students/guide',
+          target: '/units/quality',
           isActive: false
         },
         {
-          id: 52,
+          id: 92,
           title: 'وحدة تكنولوجيا المعلومات',
-          target: '/students/results',
+          target: '/units/it',
           isActive: false
-        },
-       
+        }
       ]
     },
     {
@@ -171,7 +170,7 @@ export class MenuService {
       title: 'الخدمات',
       target: '/services',
       isActive: false,
-            type: 'menu',
+      type: 'menu',
       childs: [
         {
           id: 61,
@@ -184,10 +183,8 @@ export class MenuService {
           title: 'الخدمات الإدارية',
           target: '/services/administrative',
           isActive: false
-        },
-       
+        }
       ]
-
     },
     {
       id: 7,
@@ -212,12 +209,33 @@ export class MenuService {
   }
 
   updateActiveTab(id: number): Observable<MenuTab[]> {
-    this.menuTabs.forEach(tab => {
-      tab.isActive = tab.id === id;
+    this.deactivateAll(this.menuTabs);
+    this.findAndActivate(this.menuTabs, id);
+    return of(this.menuTabs);
+  }
+
+  private deactivateAll(tabs: MenuTab[]): void {
+    tabs.forEach(tab => {
+      tab.isActive = false;
       if (tab.childs) {
-        tab.childs.forEach(child => child.isActive = false);
+        this.deactivateAll(tab.childs);
       }
     });
-    return of(this.menuTabs);
+  }
+
+  private findAndActivate(tabs: MenuTab[], id: number, parent?: MenuTab): boolean {
+    for (let tab of tabs) {
+      if (tab.id === id) {
+        tab.isActive = true;
+        if (parent) {
+          parent.isActive = true;
+        }
+        return true;
+      }
+      if (tab.childs && this.findAndActivate(tab.childs, id, tab)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

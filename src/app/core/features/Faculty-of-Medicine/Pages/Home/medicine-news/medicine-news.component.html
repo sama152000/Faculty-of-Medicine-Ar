@@ -24,14 +24,14 @@
             <div class="card-image">
               <img [src]="item.imageUrl" [alt]="item.title" loading="lazy">
               <div class="date-badge">
-                <span class="day">{{ getDateParts(item.date).day }}</span>
-                <span class="month">{{ getDateParts(item.date).month }}</span>
+                <span class="day">{{ getDateParts(item.publishDate).day }}</span>
+                <span class="month">{{ getDateParts(item.publishDate).month }}</span>
               </div>
             </div>
-            
+
             <div class="card-content">
               <div class="author-info">
-                <span class="author">بواسطة {{ item.author }}</span> / <span class="specialty">{{ item.specialty }}</span>
+                <span class="author">بواسطة {{ item.author }}</span> / <span class="specialty">{{ item.category }}</span>
               </div>
               <h3 class="card-title">{{ item.title }}</h3>
               <p class="card-excerpt">{{ item.excerpt }}</p>

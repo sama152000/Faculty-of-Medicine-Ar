@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { ContactService } from '../../../Services/contact.service';
 import { NewsService } from '../../../Services/news.service';
 import { ContactInfo } from '../../../model/contact.model';
-import { NewsItem } from '../../../model/news.model';
+import { News } from '../../../model/news.model';
 
 interface QuickLink {
   id: number;
@@ -77,11 +77,11 @@ export class MedicineFooterComponent implements OnInit {
   }
 
   private loadLatestPosts(): void {
-    this.newsService.getLatest(3).subscribe(news => {
+    this.newsService.getLatest(3).subscribe((news: News[]) => {
       this.latestPosts = news.map(item => ({
         id: item.id,
         title: item.title,
-        date: item.date,
+        date: item.publishDate,
         url: item.readMoreUrl || `/news/${item.id}`
       }));
     });

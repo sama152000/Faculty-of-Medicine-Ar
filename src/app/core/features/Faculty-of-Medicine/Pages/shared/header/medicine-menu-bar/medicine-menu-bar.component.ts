@@ -76,25 +76,11 @@ export class MedicineMenuBarComponent implements OnInit {
 
   onSubTabClick(subTab: MenuTab, parentTab: MenuTab, event: Event): void {
     event.preventDefault();
-    
-    // Update active states
-    this.menuTabs.forEach(tab => {
-      tab.isActive = false;
-      if (tab.childs) {
-        tab.childs.forEach(child => {
-          child.isActive = false;
-          if (child.childs) {
-            child.childs.forEach(subChild => {
-              subChild.isActive = subChild.id === subTab.id;
-            });
-          }
-        });
-      }
+
+    this.menuService.updateActiveTab(subTab.id).subscribe(updatedTabs => {
+      this.menuTabs = updatedTabs;
     });
-    
-    parentTab.isActive = true;
-    subTab.isActive = true;
-    
+
     this.isCollapsed = true;
     this.activeDropdown = null;
   }

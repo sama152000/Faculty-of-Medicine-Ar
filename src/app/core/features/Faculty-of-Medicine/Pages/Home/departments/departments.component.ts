@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { DepartmentService } from '../../../../Faculty-of-Medicine/Services/department.service';
+import { DepartmentsService } from '../../../../Faculty-of-Medicine/Services/departments.service';
 import { Department } from '../../../model/department.model';
 
 @Component({
@@ -22,7 +22,7 @@ export class DepartmentsComponent implements OnInit {
   departments: Department[] = [];
 
   constructor(
-    private departmentService: DepartmentService,
+    private departmentService: DepartmentsService,
     private router: Router
   ) {}
 
@@ -42,8 +42,6 @@ export class DepartmentsComponent implements OnInit {
 
   onDepartmentClick(department: Department): void {
     this.departmentClicked.emit(department);
-    if (department.url) {
-      this.router.navigate([department.url]);
-    }
+    this.router.navigate(['/departments', department.id]);
   }
 }
