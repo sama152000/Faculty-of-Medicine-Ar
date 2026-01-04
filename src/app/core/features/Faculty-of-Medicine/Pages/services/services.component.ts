@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ServiceDetail, ServiceDepartment, RelatedService, ServiceNews } from '../../model/service.model';
-import { ServiceDetailsService } from '../../Services/service-details.service';
+import { ServiceDetail } from '../../model/service.model';
+import { ServiceService } from '../../Services/service.service';
 
 @Component({
   selector: 'app-services',
@@ -13,72 +13,66 @@ import { ServiceDetailsService } from '../../Services/service-details.service';
 })
 export class ServicesComponent implements OnInit {
   service?: ServiceDetail;
-  departments: ServiceDepartment[] = [];
-  relatedServices: RelatedService[] = [];
-  serviceNews: ServiceNews[] = [];
-  
-  activeTab = 'about';
-  activeAboutSection = 'overview';
-  selectedDepartment?: ServiceDepartment;
-  selectedRelatedService?: RelatedService;
+  services: ServiceDetail[] = [];
+  isListView: boolean = false;
+  activeTab: string = 'departments';
+  activeAboutSection: string = 'overview';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private serviceDetailsService: ServiceDetailsService
+    private serviceService: ServiceService
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const serviceId = params['id'];
       if (serviceId) {
+        this.isListView = false;
         this.loadServiceData(serviceId);
+      } else {
+        this.isListView = true;
+        this.loadServices();
       }
     });
   }
 
-  private loadServiceData(serviceId: string): void {
-    // Load service details
-    this.serviceDetailsService.getById(serviceId).subscribe((service: ServiceDetail | undefined) => {
-      this.service = service;
-    });
+ private loadServiceData(serviceId: string): void {
+ this.serviceService.getById(serviceId).subscribe({
+   next: (serviceDetail) => {
+     this.service = serviceDetail;
+   },
+   error: (error) => {
+     console.error('Error loading service:', error);
+     this.service = undefined;
+   }
+ });
+ }
 
-    // Load departments
-    this.serviceDetailsService.getDepartmentsByServiceId(serviceId).subscribe((departments: ServiceDepartment[]) => {
-      this.departments = departments;
-      if (this.departments.length > 0) {
-        this.selectedDepartment = this.departments[0];
-      }
-    });
+ private loadServices(): void {
+   this.serviceService.getAll().subscribe({
+     next: (services) => {
+       this.services = services.filter(s => s.isActive);
+     },
+     error: (error) => {
+       console.error('Error loading services:', error);
+       this.services = [];
+     }
+   });
+}
 
-    // Load related services
-    this.serviceDetailsService.getRelatedServicesByServiceId(serviceId).subscribe((services: RelatedService[]) => {
-      this.relatedServices = services;
-      if (this.relatedServices.length > 0) {
-        this.selectedRelatedService = this.relatedServices[0];
-      }
-    });
+ switchTab(tab: string): void {
+   this.activeTab = tab;
+ }
 
-   
-  }
+ trackByFn(index: number, item: ServiceDetail): any {
+   return item.id;
+ }
 
-  switchTab(tabName: string): void {
-    this.activeTab = tabName;
-  }
+ onServiceClick(service: ServiceDetail): void {
+   if (service && service.id) {
+     this.router.navigate(['/services', service.id]);
+   }
+ }
 
-  switchAboutSection(sectionName: string): void {
-    this.activeAboutSection = sectionName;
-  }
-
-  selectDepartment(department: ServiceDepartment): void {
-    this.selectedDepartment = department;
-  }
-
-  selectRelatedService(service: RelatedService): void {
-    this.selectedRelatedService = service;
-  }
-
-  goToNewsDetails(newsId: number): void {
-    this.router.navigate(['/news', newsId]);
-  }
 }

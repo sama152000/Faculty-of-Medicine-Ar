@@ -67,7 +67,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 70px 30px 40px 30px; /* Increased top padding for overlapping icon */
+  padding: 70px 30px 0px 30px; /* Increased top padding for overlapping icon */
   box-shadow: var(--departments-card-shadow);
   min-height: 200px;
   box-sizing: border-box;

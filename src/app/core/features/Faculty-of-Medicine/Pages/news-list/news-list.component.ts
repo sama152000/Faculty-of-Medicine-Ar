@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NewsService } from '../../Services/news.service';
-import { News, NewsCategory } from '../../model/sector.model';
+import { News } from '../../model/news.model';
 
 @Component({
   selector: 'app-news-list',
@@ -31,7 +31,7 @@ export class NewsListComponent implements OnInit {
   }
 
   private loadNews(): void {
-    this.newsService.getAll().subscribe(news => {
+    this.newsService.getAllNews().subscribe(news => {
       this.allNews = news;
       this.applyFilter();
     });
@@ -46,13 +46,19 @@ export class NewsListComponent implements OnInit {
   private applyFilter(): void {
     switch (this.activeFilter) {
       case 'news':
-        this.filteredNews = this.allNews.filter(news => news.category === NewsCategory.NEWS);
+        this.filteredNews = this.allNews.filter(n =>
+          n.postCategories.some(c => c.categoryName === 'الأخبار')
+        );
         break;
       case 'conferences':
-        this.filteredNews = this.allNews.filter(news => news.category === NewsCategory.CONFERENCES);
+        this.filteredNews = this.allNews.filter(n =>
+          n.postCategories.some(c => c.categoryName.includes('مؤتمرات'))
+        );
         break;
       case 'events':
-        this.filteredNews = this.allNews.filter(news => news.category === NewsCategory.EVENTS);
+        this.filteredNews = this.allNews.filter(n =>
+          n.postCategories.some(c => c.categoryName.includes('فعاليات') || c.categoryName.includes('احداث'))
+        );
         break;
       default:
         this.filteredNews = [...this.allNews];
@@ -95,20 +101,14 @@ export class NewsListComponent implements OnInit {
     return pages;
   }
 
-  getCategoryBadgeClass(category: NewsCategory): string {
-    switch (category) {
-      case NewsCategory.NEWS:
-        return 'badge-primary';
-      case NewsCategory.CONFERENCES:
-        return 'badge-success';
-      case NewsCategory.EVENTS:
-        return 'badge-warning';
-      default:
-        return 'badge-secondary';
-    }
+  getCategoryBadgeClass(categoryName: string): string {
+    if (categoryName === 'الأخبار') return 'badge-primary';
+    if (categoryName.includes('مؤتمرات')) return 'badge-success';
+    if (categoryName.includes('فعاليات') || categoryName.includes('احداث')) return 'badge-warning';
+    return 'badge-secondary';
   }
 
-  goToNewsDetails(newsId: number): void {
+  goToNewsDetails(newsId: string): void {
     this.router.navigate(['/news', newsId]);
   }
 }

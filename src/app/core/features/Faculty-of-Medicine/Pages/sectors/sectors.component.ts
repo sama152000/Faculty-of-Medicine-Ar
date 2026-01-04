@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SectorService } from '../../Services/sector.service';
-import { NewsService } from '../../Services/news.service';
-import { Sector, Department, Service, News } from '../../model/sector.model';
+import { SectorsService } from '../../Services/sector.service';
+import { Sector, SectorDetail, SectorMember, SectorProgram, SectorService, SectorPost } from '../../model/sector.model';
 
 @Component({
   selector: 'app-sectors',
@@ -14,56 +13,67 @@ import { Sector, Department, Service, News } from '../../model/sector.model';
 })
 export class SectorsComponent implements OnInit {
   sector?: Sector;
-  departments: Department[] = [];
-  services: Service[] = [];
-  sectorNews: News[] = [];
-  
+  sectorDetail?: SectorDetail;
+  sectorMembers: SectorMember[] = [];
+  sectorPrograms: SectorProgram[] = [];
+  sectorServices: SectorService[] = [];
+  sectorPosts: SectorPost[] = [];
+
   activeTab = 'about';
   activeAboutSection = 'overview';
-  selectedDepartment?: Department;
-  selectedService?: Service;
+  selectedProgram?: SectorProgram;
+  selectedService?: SectorService;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private sectorService: SectorService,
-    private newsService: NewsService
+    private sectorsService: SectorsService
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      const sectorId = +params['id'];
+      const sectorId = params['id']; // id من الـ route بيكون string
       if (sectorId) {
         this.loadSectorData(sectorId);
       }
     });
   }
 
-  private loadSectorData(sectorId: number): void {
-    // Load sector details
-    this.sectorService.getById(sectorId).subscribe(sector => {
+  private loadSectorData(sectorId: string): void {
+    // بيانات القطاع الأساسية
+    this.sectorsService.getSectorById(sectorId).subscribe(sector => {
       this.sector = sector;
     });
 
-    // Load departments
-    this.sectorService.getDepartmentsBySectorId(sectorId).subscribe(departments => {
-      this.departments = departments;
-      if (this.departments.length > 0) {
-        this.selectedDepartment = this.departments[0];
+    // تفاصيل القطاع
+    this.sectorsService.getSectorDetailsById(sectorId).subscribe(detail => {
+      this.sectorDetail = detail;
+    });
+
+    // أعضاء القطاع
+    this.sectorsService.getSectorMembersById(sectorId).subscribe(members => {
+      this.sectorMembers = members;
+    });
+
+    // برامج القطاع
+    this.sectorsService.getSectorProgramsById(sectorId).subscribe(programs => {
+      this.sectorPrograms = programs;
+      if (this.sectorPrograms.length > 0) {
+        this.selectedProgram = this.sectorPrograms[0];
       }
     });
 
-    // Load services
-    this.sectorService.getServicesBySectorId(sectorId).subscribe(services => {
-      this.services = services;
-      if (this.services.length > 0) {
-        this.selectedService = this.services[0];
+    // خدمات القطاع
+    this.sectorsService.getSectorServicesById(sectorId).subscribe(services => {
+      this.sectorServices = services;
+      if (this.sectorServices.length > 0) {
+        this.selectedService = this.sectorServices[0];
       }
     });
 
-    // Load sector news
-    this.newsService.getNewsBySectorId(sectorId).subscribe(news => {
-      this.sectorNews = news;
+    // منشورات القطاع
+    this.sectorsService.getSectorPostsById(sectorId).subscribe(posts => {
+      this.sectorPosts = posts;
     });
   }
 
@@ -75,15 +85,15 @@ export class SectorsComponent implements OnInit {
     this.activeAboutSection = sectionName;
   }
 
-  selectDepartment(department: Department): void {
-    this.selectedDepartment = department;
+  selectProgram(program: SectorProgram): void {
+    this.selectedProgram = program;
   }
 
-  selectService(service: Service): void {
+  selectService(service: SectorService): void {
     this.selectedService = service;
   }
 
-  goToNewsDetails(newsId: number): void {
-    this.router.navigate(['/news', newsId]);
+  goToPostDetails(postId: string): void {
+    this.router.navigate(['/posts', postId]);
   }
 }

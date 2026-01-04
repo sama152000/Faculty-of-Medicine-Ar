@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ServiceService } from '../../../Services/service.service';
-import { Service } from '../../../model/service.model';
+import { ServiceDetail } from '../../../model/service.model';
 
 @Component({
   selector: 'app-services',
@@ -18,10 +18,10 @@ export class ServicesComponent implements OnInit {
   @Input() allServicesText = 'جميع الخدمات';
   @Input() allServicesUrl = '/services';
   
-  @Output() serviceClicked = new EventEmitter<Service>();
+  @Output() serviceClicked = new EventEmitter<ServiceDetail>();
   @Output() allServicesClicked = new EventEmitter<void>();
 
-  services: Service[] = [];
+  services: ServiceDetail[] = [];
 
   constructor(
     private serviceService: ServiceService,
@@ -32,20 +32,26 @@ export class ServicesComponent implements OnInit {
     this.loadServices();
   }
 
-  trackByFn(index: number, item: Service): any {
+  trackByFn(index: number, item: ServiceDetail): any {
     return item.id;
   }
 
   private loadServices(): void {
     this.serviceService.getAll().subscribe(services => {
-      this.services = services;
+      // نعرض فقط الخدمات الفعالة
+      this.services = services.filter(s => s.isActive);
+      // Set allServicesUrl to first service if available
+      if (this.services.length > 0) {
+        this.allServicesUrl = '/services/' + this.services[0].id;
+      }
     });
   }
 
-  onServiceClick(service: Service): void {
+  onServiceClick(service: ServiceDetail): void {
     this.serviceClicked.emit(service);
-    if (service.url) {
-      this.router.navigate([service.url]);
+    // التنقل باستخدام الـ id من الـ backend
+    if (service && service.id != null && service.id !== '') {
+      this.router.navigate(['/services', String(service.id)]);
     }
   }
 
@@ -53,3 +59,4 @@ export class ServicesComponent implements OnInit {
     this.allServicesClicked.emit();
   }
 }
+

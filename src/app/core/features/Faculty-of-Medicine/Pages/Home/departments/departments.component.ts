@@ -35,7 +35,7 @@ export class DepartmentsComponent implements OnInit {
   }
 
   private loadDepartments(): void {
-    this.departmentService.getAll().subscribe(departments => {
+    this.departmentService.getAllDepartments().subscribe(departments => {
       this.departments = departments;
     });
   }

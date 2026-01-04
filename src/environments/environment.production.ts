@@ -1,4 +1,7 @@
+
 export const environment = {
-  production: false,
+  production: true,
+  state: 'production',
   apiUrl: 'https://medicinecollegear.runasp.net/api/v1/'  
+
 };

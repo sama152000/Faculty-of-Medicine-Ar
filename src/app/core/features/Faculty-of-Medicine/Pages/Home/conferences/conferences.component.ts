@@ -1,30 +1,38 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ConferenceService } from '../../../Services/conference.service';
-import { Conference } from '../../../model/conference.model';
+import { NewsService } from '../../../Services/news.service';
+import { News } from '../../../model/news.model';
 
 @Component({
   selector: 'app-conference-upcoming',
   standalone: true,
   imports: [CommonModule, RouterModule],
-templateUrl: './conferences.component.html',
+  templateUrl: './conferences.component.html',
   styleUrls: ['./conferences.component.css']
 })
 export class ConferenceUpcomingComponent implements OnInit {
   @Input() sectionTitle = 'المؤتمرات القادمة';
 
-  conferences: Conference[] = [];
+  conferences: News[] = [];
 
-  constructor(private conferenceService: ConferenceService) {}
+  constructor(private newsService: NewsService) {}
 
   ngOnInit(): void {
     this.loadUpcomingConferences();
   }
 
   private loadUpcomingConferences(): void {
-    this.conferenceService.getAll().subscribe(conferences => {
-      this.conferences = conferences.slice(0, 3);
+    this.newsService.getAllNews().subscribe(allNews => {
+      // فلترة الأخبار حسب الكاتيجوري "مؤتمرات وفعاليات"
+      const conferencesOnly = allNews.filter(n =>
+        n.postCategories.some(c => c.categoryName.includes('مؤتمرات'))
+      );
+
+      // ترتيب حسب التاريخ واختيار آخر 3
+      this.conferences = [...conferencesOnly].sort((a, b) =>
+        new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()
+      ).slice(0, 3);
     });
   }
 }

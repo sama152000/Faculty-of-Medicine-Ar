@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NewsService } from '../../../Services/news.service';
-import { News, NewsCategory } from '../../../model/news.model';
+import { News } from '../../../model/news.model';
 
 @Component({
   selector: 'app-news-details',
@@ -26,16 +26,15 @@ export class NewsDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      const newsId = +params['id'];
+      const newsId = params['id']; // id من الـ route بيكون string
       if (newsId) {
         this.loadNewsDetails(newsId);
       }
     });
   }
 
-  private loadNewsDetails(newsId: number): void {
-    // Load main news
-    this.newsService.getById(newsId).subscribe(news => {
+  private loadNewsDetails(newsId: string): void {
+    this.newsService.getNewsById(newsId).subscribe(news => {
       if (news) {
         this.news = news;
         this.newsNotFound = false;
@@ -46,39 +45,37 @@ export class NewsDetailsComponent implements OnInit {
     });
   }
 
-  private loadRelatedData(newsId: number): void {
-    // Load related news
-    this.newsService.getRelatedNews(newsId).subscribe(related => {
-      this.relatedNews = related;
-    });
+  private loadRelatedData(newsId: string): void {
+    this.newsService.getAllNews().subscribe(allNews => {
+      // أخبار ذات صلة بنفس التصنيف
+      if (this.news?.postCategories?.length) {
+        const category = this.news.postCategories[0].categoryName;
+        this.relatedNews = allNews.filter(n =>
+          n.id !== newsId &&
+          n.postCategories.some(c => c.categoryName === category)
+        ).slice(0, 5);
+      }
 
-    // Load previous news
-    this.newsService.getPreviousNews(newsId).subscribe(previous => {
-      this.previousNews = previous;
-    });
+      // ترتيب الأخبار حسب التاريخ
+      const sorted = [...allNews].sort((a, b) =>
+        new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime()
+      );
+      const index = sorted.findIndex(n => n.id === newsId);
 
-    // Load next news
-    this.newsService.getNextNews(newsId).subscribe(next => {
-      this.nextNews = next;
+      this.previousNews = index > 0 ? sorted[index - 1] : undefined;
+      this.nextNews = index < sorted.length - 1 ? sorted[index + 1] : undefined;
     });
   }
 
-  getCategoryBadgeClass(category: NewsCategory): string {
-    switch (category) {
-      case NewsCategory.NEWS:
-        return 'badge-primary';
-      case NewsCategory.CONFERENCES:
-        return 'badge-success';
-      case NewsCategory.EVENTS:
-        return 'badge-warning';
-      default:
-        return 'badge-secondary';
-    }
+  getCategoryBadgeClass(categoryName: string): string {
+    if (categoryName === 'الأخبار') return 'badge-primary';
+    if (categoryName.includes('مؤتمرات')) return 'badge-success';
+    if (categoryName.includes('فعاليات') || categoryName.includes('احداث')) return 'badge-warning';
+    return 'badge-secondary';
   }
 
-  goToNewsDetails(newsId: number): void {
+  goToNewsDetails(newsId: string): void {
     this.router.navigate(['/news', newsId]).then(() => {
-      // Scroll to top when navigating to new news
       window.scrollTo(0, 0);
     });
   }
