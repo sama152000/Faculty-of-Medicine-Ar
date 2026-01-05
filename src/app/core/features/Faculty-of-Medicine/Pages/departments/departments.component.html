@@ -120,14 +120,15 @@
 
         <!-- Content -->
         <div class="col-md-9">
-          <div class="card" *ngIf="selectedProgram">
-            <div class="card-body">
-              <h3 class="text-brown mb-3">{{ selectedProgram.name }}</h3>
-              <p><strong>اسم البرنامج:</strong> {{ selectedProgram.programName }}</p>
-              <p><strong>القسم:</strong> {{ selectedProgram.departmentName }}</p>
-            </div>
-          </div>
-        </div>
+                 <div class="card" *ngIf="selectedProgram">
+                   <div class="card-body">
+                     <h3 class="text-brown mb-3">{{ selectedProgram.name }}</h3>
+                     <p><strong>اسم البرنامج:</strong> {{ selectedProgram.programName }}</p>
+                     <p><strong>القسم:</strong> {{ selectedProgram.departmentName }}</p>
+                     <a [routerLink]="['/programs', selectedProgram.programId]" class="btn btn-medicine">عرض البرنامج</a>
+                   </div>
+                 </div>
+               </div>
       </div>
     </div>
 

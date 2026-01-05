@@ -1,20 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { ContactService } from '../../../Services/contact.service';
 import { NewsService } from '../../../Services/news.service';
 import { LogoService } from '../../../Services/logo.service'; // ✅ استدعاء خدمة اللوجو
+import { FooterService } from '../../../Services/footer.service';
+import { DepartmentsService } from '../../../Services/departments.service';
+import { CentersService } from '../../../Services/centers.service';
+import { ServiceService } from '../../../Services/service.service';
 import { Contact } from '../../../model/contact.model';
 import { News } from '../../../model/news.model';
 import { Logo } from '../../../model/logo.model'; // ✅ موديل اللوجو
-
-interface QuickLink {
-  id: number;
-  text: string;
-  url: string;
-  icon: string;
-}
+import { Footer, QuickLink, SocialLink } from '../../../model/footer.model';
 
 @Component({
   selector: 'app-medicine-footer',
@@ -26,25 +25,29 @@ interface QuickLink {
 export class MedicineFooterComponent implements OnInit {
   contact?: Contact;
   logoUrl?: string; // ✅ متغير للوجو
-  quickLinks: QuickLink[] = [
-    { id: 1, text: 'عن الكلية', url: '/about', icon: '→' },
-    { id: 2, text: 'الأقسام الأكاديمية', url: '/departments', icon: '→' },
-    { id: 3, text: 'البحث العلمي', url: '/research', icon: '→' },
-    { id: 4, text: 'الخدمات الإلكترونية', url: '/services', icon: '→' },
-    { id: 6, text: 'اتصل بنا', url: '/contact', icon: '→' }
-  ];
+  footer?: Footer;
+  quickLinks: QuickLink[] = this.getDefaultQuickLinks();
+  socialLinks: SocialLink[] = [];
   latestPosts: { id: string; title: string; date: string; url: string }[] = [];
 
   constructor(
     private contactService: ContactService,
     private newsService: NewsService,
-    private logoService: LogoService // ✅ حقن خدمة اللوجو
+    private logoService: LogoService, // ✅ حقن خدمة اللوجو
+    private footerService: FooterService,
+    private departmentsService: DepartmentsService,
+    private centersService: CentersService,
+    private serviceService: ServiceService
   ) {}
 
   ngOnInit(): void {
+    // this.loadFooter(); // Commented out to avoid 404 error until backend implements the endpoint
     this.loadContactInfo();
     this.loadLatestPosts();
     this.loadLogo(); // ✅ تحميل اللوجو
+    this.updateDepartmentLink();
+    this.updateCentersLink();
+    this.updateServicesLink();
   }
 
   trackByFn(index: number, item: any): any {
@@ -67,7 +70,7 @@ export class MedicineFooterComponent implements OnInit {
           const dateB = b.publishedDate ? new Date(b.publishedDate).getTime() : 0;
           return dateB - dateA;
         })
-        .slice(0, 3)
+        .slice(0, 4)
       )
     ).subscribe((news: News[]) => {
       this.latestPosts = news.map(item => ({
@@ -77,6 +80,65 @@ export class MedicineFooterComponent implements OnInit {
         url: `/news/${item.id}`
       }));
     });
+  }
+
+  private loadFooter(): void {
+    this.footerService.getFooter().pipe(
+      catchError(() => of(null))
+    ).subscribe(footer => {
+      if (footer) {
+        this.footer = footer;
+        this.quickLinks = footer.quickLinks && footer.quickLinks.length > 0 ? footer.quickLinks : this.getDefaultQuickLinks();
+        this.socialLinks = footer.socialLinks || [];
+      }
+      // If footer is null, keep defaults
+    });
+  }
+
+  private updateDepartmentLink(): void {
+    this.departmentsService.getAllDepartments().subscribe(departments => {
+      if (departments && departments.length > 0) {
+        const firstDepartment = departments[0];
+        const departmentLink = this.quickLinks.find(link => link.id === '2');
+        if (departmentLink) {
+          departmentLink.url = `/departments/${firstDepartment.id}`;
+        }
+      }
+    });
+  }
+
+  private updateCentersLink(): void {
+    this.centersService.getAllCenters().subscribe(centers => {
+      if (centers && centers.length > 0) {
+        const firstCenter = centers[0];
+        const centerLink = this.quickLinks.find(link => link.id === '3');
+        if (centerLink) {
+          centerLink.url = `/centers/${firstCenter.id}`;
+        }
+      }
+    });
+  }
+
+  private updateServicesLink(): void {
+    this.serviceService.getAll().subscribe(services => {
+      if (services && services.length > 0) {
+        const firstService = services[0];
+        const serviceLink = this.quickLinks.find(link => link.id === '4');
+        if (serviceLink) {
+          serviceLink.url = `/services/${firstService.id}`;
+        }
+      }
+    });
+  }
+
+  private getDefaultQuickLinks(): QuickLink[] {
+    return [
+      { id: '1', text: 'عن الكلية', url: '/about', icon: '→' },
+      { id: '2', text: 'الأقسام الأكاديمية', url: '/departments', icon: '→' },
+      { id: '3', text: 'المراكز', url: '/centers', icon: '→' },
+      { id: '4', text: 'الخدمات ', url: '/services', icon: '→' },
+      { id: '5', text: 'اتصل بنا', url: '/contact', icon: '→' }
+    ];
   }
 
   private loadLogo(): void {

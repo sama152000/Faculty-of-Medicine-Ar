@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ServiceService } from '../../../Services/service.service';
 import { ServiceDetail } from '../../../model/service.model';
 
@@ -25,11 +25,23 @@ export class ServicesComponent implements OnInit {
 
   constructor(
     private serviceService: ServiceService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    this.loadServices();
+    this.route.params.subscribe(params => {
+      const id = params['id'];
+      if (id) {
+        this.serviceService.getById(id).subscribe(service => {
+          if (service) {
+            this.services = [service];
+          }
+        });
+      } else {
+        this.loadServices();
+      }
+    });
   }
 
   trackByFn(index: number, item: ServiceDetail): any {

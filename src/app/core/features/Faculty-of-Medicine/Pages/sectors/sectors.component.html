@@ -1,7 +1,7 @@
 <div class="container section">
   <!-- Sector Title Section -->
-  <div class="sector-header bg-primary text-white p-4 mb-4 rounded">
-    <h1 class="mb-0">{{ sector?.name || 'جاري تحميل البيانات...' }}</h1>
+  <div class="sector-header  text-white p-4 mb-4 rounded">
+    <h1 class="text-brown">{{ sector?.name || 'جاري تحميل البيانات...' }}</h1>
   </div>
 
   <!-- Horizontal Tabs -->
@@ -127,6 +127,8 @@
               <h3 class="text-brown mb-3">{{ selectedProgram.name }}</h3>
               <p><strong>اسم البرنامج:</strong> {{ selectedProgram.programName }}</p>
               <p><strong>القطاع:</strong> {{ selectedProgram.sectorName }}</p>
+                                   <a [routerLink]="['/programs', selectedProgram.programId]" class="btn btn-medicine">عرض البرنامج</a>
+
             </div>
           </div>
         </div>
@@ -166,18 +168,25 @@
 
     <!-- Posts Tab Content -->
     <div *ngIf="activeTab === 'posts'" class="col-12">
-      <div class="card">
-        <div class="card-body">
           <h3 class="text-brown mb-3">منشورات القطاع</h3>
-          <ul>
-            <li *ngFor="let post of sectorPosts">
-              {{ post.postName }}
-              <button class="btn btn-link" (click)="goToPostDetails(post.postId)">عرض</button>
-            </li>
-          </ul>
+          <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4" *ngFor="let post of sectorPosts">
+              <div class="news-card">
+                <div class="news-card-body">
+                  <img *ngIf="post.postAttachments?.length"
+                       [src]="post.postAttachments[0].url"
+                       alt="{{ post.title }}"
+                       class="news-card-image mb-3"
+                       style="width:100%; height: 300px;">
+                  <h5 class="news-card-title">{{ post.title }}</h5>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <button class="btn btn-medicine btn-sm" [routerLink]="['/news', post.id]">اقرأ المزيد</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 
     <!-- Members Tab Content -->
     <div *ngIf="activeTab === 'members'" class="col-12">

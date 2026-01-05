@@ -36,7 +36,7 @@ export class DepartmentsComponent implements OnInit {
 
   private loadDepartments(): void {
     this.departmentService.getAllDepartments().subscribe(departments => {
-      this.departments = departments;
+      this.departments = departments.slice(0, 6);
     });
   }
 

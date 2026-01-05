@@ -1,13 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import {  RouterModule } from '@angular/router';
+
 import { SectorsService } from '../../Services/sector.service';
+import { NewsService } from '../../Services/news.service';
 import { Sector, SectorDetail, SectorMember, SectorProgram, SectorService, SectorPost } from '../../model/sector.model';
+import { News } from '../../model/news.model';
 
 @Component({
   selector: 'app-sectors',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './sectors.component.html',
   styleUrls: ['./sectors.component.css']
 })
@@ -17,7 +21,7 @@ export class SectorsComponent implements OnInit {
   sectorMembers: SectorMember[] = [];
   sectorPrograms: SectorProgram[] = [];
   sectorServices: SectorService[] = [];
-  sectorPosts: SectorPost[] = [];
+  sectorPosts: News[] = [];
 
   activeTab = 'about';
   activeAboutSection = 'overview';
@@ -27,7 +31,8 @@ export class SectorsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private sectorsService: SectorsService
+    private sectorsService: SectorsService,
+    private newsService: NewsService
   ) {}
 
   ngOnInit(): void {
@@ -72,8 +77,11 @@ export class SectorsComponent implements OnInit {
     });
 
     // منشورات القطاع
-    this.sectorsService.getSectorPostsById(sectorId).subscribe(posts => {
-      this.sectorPosts = posts;
+    this.sectorsService.getSectorPostsById(sectorId).subscribe(sectorPosts => {
+      const postIds = sectorPosts.map(p => p.postId);
+      this.newsService.getAllNews().subscribe(allNews => {
+        this.sectorPosts = allNews.filter(n => postIds.includes(n.id));
+      });
     });
   }
 

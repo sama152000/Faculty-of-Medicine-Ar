@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { NewsService } from '../../Services/news.service';
 import { News } from '../../model/news.model';
 
@@ -18,16 +18,23 @@ export class NewsListComponent implements OnInit {
   
   activeFilter = 'all';
   currentPage = 1;
-  itemsPerPage = 9;
+  itemsPerPage = 6;
   totalPages = 1;
 
   constructor(
     private newsService: NewsService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    this.loadNews();
+    this.route.queryParams.subscribe(params => {
+      const filter = params['filter'];
+      if (filter && ['all', 'news', 'conferences', 'events'].includes(filter)) {
+        this.activeFilter = filter;
+      }
+      this.loadNews();
+    });
   }
 
   private loadNews(): void {

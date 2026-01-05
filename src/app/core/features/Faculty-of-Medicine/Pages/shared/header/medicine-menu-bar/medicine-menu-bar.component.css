@@ -93,7 +93,7 @@
       top: 100%;
       left: 0;
       right: 0;
-      background: var(--medicine-menu-bg);
+      background: rgba(255, 255, 255, 0.726);
       box-shadow: var(--medicine-menu-shadow);
       border-top: 1px solid var(--medicine-menu-border);
       border-radius: 0 0 8px 8px;
@@ -367,6 +367,7 @@
     margin: 0;
     padding: 0.75rem 1rem;
     text-align: left;
+    color: var(--medicine-primary-red);
   }
 
   .dropdown-menu {

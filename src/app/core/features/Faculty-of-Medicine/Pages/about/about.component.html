@@ -106,13 +106,13 @@
           <!-- عميد الكلية -->
           <div *ngIf="president" class="mb-4">
             <h5 class="text-primary">عميد الكلية</h5>
-            <div class="d-flex align-items-center">
-              <img *ngIf="president.memberAttachments?.length"
-                   [src]="president.memberAttachments[0].url"
-                   alt="{{ president.fullName }}"
-                   class="img-thumbnail me-3"
-                   style="width:80px;height:80px;">
-              <div>
+            <div class="d-flex align-items-center gap-3">
+                         <img *ngIf="president.memberAttachments?.length"
+                              [src]="president.memberAttachments[0].url"
+                              alt="{{ president.fullName }}"
+                              class="img-thumbnail me-4 "
+                              style="width:80px;height:80px;">
+                         <div>
                 <p class="mb-1"><strong>{{ president.fullName }}</strong></p>
                 <p class="mb-1">{{ president.position }}</p>
                 <p class="mb-0 text-muted">{{ president.specialization }}</p>
