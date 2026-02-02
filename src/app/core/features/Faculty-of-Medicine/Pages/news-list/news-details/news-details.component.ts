@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NewsService } from '../../../Services/news.service';
 import { News } from '../../../model/news.model';
+import { slugify } from '../../../../../../utils/slugify';
 
 @Component({
   selector: 'app-news-details',
@@ -26,19 +27,19 @@ export class NewsDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      const newsId = params['id']; // id من الـ route بيكون string
-      if (newsId) {
-        this.loadNewsDetails(newsId);
+      const slug = params['slug']; // نقرأ الـ slug بدل الـ id
+      if (slug) {
+        this.loadNewsDetails(slug);
       }
     });
   }
 
-  private loadNewsDetails(newsId: string): void {
-    this.newsService.getNewsById(newsId).subscribe(news => {
+  private loadNewsDetails(slug: string): void {
+    this.newsService.getNewsBySlug(slug).subscribe(news => {
       if (news) {
         this.news = news;
         this.newsNotFound = false;
-        this.loadRelatedData(newsId);
+        this.loadRelatedData(news.id); // نستخدم الـ id الداخلي لجلب الأخبار المرتبطة
       } else {
         this.newsNotFound = true;
       }
@@ -74,8 +75,8 @@ export class NewsDetailsComponent implements OnInit {
     return 'badge-secondary';
   }
 
-  goToNewsDetails(newsId: string): void {
-    this.router.navigate(['/news', newsId]).then(() => {
+  goToNewsDetails(news: News): void {
+    this.router.navigate(['/news', slugify(news.title)]).then(() => {
       window.scrollTo(0, 0);
     });
   }

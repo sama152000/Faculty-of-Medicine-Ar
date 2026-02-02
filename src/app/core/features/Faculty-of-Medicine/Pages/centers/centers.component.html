@@ -73,7 +73,8 @@
             <div class="card-body">
               <div *ngIf="activeAboutSection === 'overview'">
                 <h3 class="text-brown mb-3">نظرة عامة</h3>
-                <p>{{ center?.about }}</p>
+                <p *ngIf="center?.about">{{ center?.about }}</p>
+                <p *ngIf="!center?.about">لا توجد معلومات متاحة عن المركز.</p>
               </div>
 
               <div *ngIf="activeAboutSection === 'vision'">
@@ -98,15 +99,16 @@
       </div>
     </div>
 
-    <!-- Services Tab Content -->
+    <!-- details Tab Content -->
     <div *ngIf="activeTab === 'services'" class="col-12">
-      <div class="card">
+      <div class="card" *ngIf="centerDetail?.title || centerDetail?.description || centerDetail?.content">
         <div class="card-body">
           <h3 class="text-brown mb-3">{{ centerDetail?.title }}</h3>
           <p class="mb-3">{{ centerDetail?.description }}</p>
           <p>{{ centerDetail?.content }}</p>
         </div>
       </div>
+      <p *ngIf="!centerDetail?.title && !centerDetail?.description && !centerDetail?.content">لا توجد معلومات متاحة.</p>
     </div>
 
     <!-- Members Tab Content -->

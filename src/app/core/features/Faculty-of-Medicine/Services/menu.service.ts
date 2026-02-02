@@ -1,23 +1,37 @@
 import { Injectable } from '@angular/core';
 import { MenuTab } from '../model/menu.model';
-import { Observable, of, forkJoin } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable, forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ServiceService } from './service.service';
 import { CentersService } from './centers.service';
 import { UnitsService } from './units.service';
 import { ProgramsService } from './programs.service';
 import { DepartmentsService } from './departments.service';
 import { SectorsService } from './sector.service';
+import { slugify } from '../../../../utils/slugify';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MenuService {
 
-  constructor(private serviceService: ServiceService, private centersService: CentersService, private unitsService: UnitsService, private programsService: ProgramsService, private departmentsService: DepartmentsService, private sectorsService: SectorsService) {}
+  constructor(
+    private serviceService: ServiceService,
+    private centersService: CentersService,
+    private unitsService: UnitsService,
+    private programsService: ProgramsService,
+    private departmentsService: DepartmentsService,
+    private sectorsService: SectorsService
+  ) {}
 
-
-  private buildMenuTabs(services: any[], centers: any[], units: any[], programs: any[], departments: any[], sectors: any[]): MenuTab[] {
+  private buildMenuTabs(
+    services: any[],
+    centers: any[],
+    units: any[],
+    programs: any[],
+    departments: any[],
+    sectors: any[]
+  ): MenuTab[] {
     return [
       {
         id: 1,
@@ -30,19 +44,13 @@ export class MenuService {
         title: 'عن الكلية',
         target: '/about',
         isActive: false,
-     
       },
       {
         id: 3,
-        title: 'الأقسام الأكاديمية',
+        title: 'الأقسام',
         isActive: false,
-        type: 'menu',
-        childs: departments.map(department => ({
-          id: parseInt(department.id),
-          title: department.name,
-          target: `/departments/${department.id}`,
-          isActive: false
-        }))
+        type: 'columns',
+        childs: this.buildDepartmentColumns(departments)
       },
       {
         id: 31,
@@ -52,7 +60,7 @@ export class MenuService {
         childs: programs.map(program => ({
           id: parseInt(program.id),
           title: program.pageTitle,
-          target: `/programs/${program.id}`,
+          target: `/programs/${slugify(program.pageTitle)}`,
           isActive: false
         }))
       },
@@ -64,7 +72,7 @@ export class MenuService {
         childs: sectors.map(sector => ({
           id: parseInt(sector.id),
           title: sector.name,
-          target: `/sectors/${sector.id}`,
+          target: `/sectors/${slugify(sector.name)}`,
           isActive: false
         }))
       },
@@ -76,7 +84,7 @@ export class MenuService {
         childs: centers.map(center => ({
           id: parseInt(center.id),
           title: center.centerName,
-          target: `/centers/${center.id}`,
+          target: `/centers/${slugify(center.centerName)}`,
           isActive: false
         }))
       },
@@ -88,7 +96,7 @@ export class MenuService {
         childs: units.map(unit => ({
           id: parseInt(unit.id),
           title: unit.unitTitle,
-          target: `/units/${unit.id}`,
+          target: `/units/${slugify(unit.unitTitle)}`,
           isActive: false
         }))
       },
@@ -101,7 +109,7 @@ export class MenuService {
         childs: services.map(service => ({
           id: parseInt(service.id),
           title: service.title,
-          target: `/services/${service.id}`,
+          target: `/services/${slugify(service.title)}`,
           isActive: false
         }))
       },
@@ -120,6 +128,62 @@ export class MenuService {
     ];
   }
 
+  private buildDepartmentColumns(departments: any[]): MenuTab[] {
+    const scientificDept: any[] = [];
+    const clinicalDept: any[] = [];
+
+    // تقسيم الأقسام بناءً على كلمة "علم"
+    departments.forEach(department => {
+      const category = this.getDefaultCategory(department);
+      if (category === 'scientific') {
+        scientificDept.push(department);
+      } else {
+        clinicalDept.push(department);
+      }
+    });
+
+    const columns: MenuTab[] = [];
+
+    if (scientificDept.length > 0) {
+      columns.push({
+        id: 100,
+        title: 'الأقسام الأكاديمية',
+        isActive: false,
+        childs: scientificDept.map(department => ({
+          id: parseInt(department.id),
+          title: department.name,
+          target: `/departments/${slugify(department.name)}`,
+          isActive: false
+        }))
+      });
+    }
+
+    if (clinicalDept.length > 0) {
+      columns.push({
+        id: 101,
+        title: 'الأقسام الإكلينيكية',
+        isActive: false,
+        childs: clinicalDept.map(department => ({
+          id: parseInt(department.id),
+          title: department.name,
+          target: `/departments/${slugify(department.name)}`,
+          isActive: false
+        }))
+      });
+    }
+
+    return columns;
+  }
+
+  private getDefaultCategory(department: any): string {
+    // لو الاسم يحتوي على كلمة "علم" يبقى أكاديمي
+    if (department.name.includes('علم')) {
+      return 'scientific';
+    }
+    // غير كده يبقى إكلينيكي
+    return 'clinical';
+  }
+
   getMenuTabs(): Observable<MenuTab[]> {
     return forkJoin({
       services: this.serviceService.getAll(),
@@ -129,7 +193,9 @@ export class MenuService {
       departments: this.departmentsService.getAllDepartments(),
       sectors: this.sectorsService.getAllSectors()
     }).pipe(
-      map(({ services, centers, units, programs, departments, sectors }) => this.buildMenuTabs(services, centers, units, programs, departments, sectors))
+      map(({ services, centers, units, programs, departments, sectors }) =>
+        this.buildMenuTabs(services, centers, units, programs, departments, sectors)
+      )
     );
   }
 

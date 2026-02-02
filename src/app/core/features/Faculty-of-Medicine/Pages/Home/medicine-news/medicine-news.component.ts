@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { NewsService } from '../../../Services/news.service';
 import { News } from '../../../model/news.model';
+import { slugify } from '../../../../../../utils/slugify';
 
 @Component({
   selector: 'app-medicine-news',
@@ -32,7 +33,7 @@ export class MedicineNewsComponent implements OnInit {
 
   private loadNews(): void {
     this.newsService.getAllNews().subscribe(news => {
-      // ترتيب الأخبار حسب التاريخ واختيار آخر 3
+      // ترتيب الأخبار حسب التاريخ واختيار آخر N حسب itemsPerView
       this.newsItems = [...news].sort((a, b) =>
         new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()
       ).slice(0, this.itemsPerView);
@@ -49,7 +50,8 @@ export class MedicineNewsComponent implements OnInit {
     };
   }
 
-  goToNewsDetails(newsId: string): void {
-    this.router.navigate(['/news', newsId]);
+  goToNewsDetails(news: News): void {
+    // التوجيه بالـ slug بدل الـ id
+    this.router.navigate(['/news', slugify(news.title)]);
   }
 }

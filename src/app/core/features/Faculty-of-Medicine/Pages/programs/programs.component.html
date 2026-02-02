@@ -73,7 +73,8 @@
             <div class="card-body">
               <div *ngIf="activeAboutSection === 'overview'">
                 <h3 class="text-brown mb-3">نظرة عامة</h3>
-                <p>{{ program?.about }}</p>
+                <p *ngIf="program?.about">{{ program?.about }}</p>
+                <p *ngIf="!program?.about">لا توجد معلومات متاحة عن البرنامج.</p>
               </div>
 
               <div *ngIf="activeAboutSection === 'vision'">
@@ -100,7 +101,7 @@
 
     <!-- Details Tab Content -->
     <div *ngIf="activeTab === 'details'" class="col-12">
-      <div class="card">
+      <div class="card" *ngIf="programDetail?.title || programDetail?.content">
         <div class="card-body">
           <h3 class="text-brown mb-3">{{ programDetail?.title }}</h3>
           <p class="mb-3">{{ programDetail?.content }}</p>
@@ -110,6 +111,7 @@
           </ul>
         </div>
       </div>
+      <p *ngIf="!programDetail?.title && !programDetail?.content">لا توجد معلومات متاحة.</p>
     </div>
 
     <!-- Members Tab Content -->

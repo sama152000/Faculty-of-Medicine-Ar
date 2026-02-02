@@ -7,7 +7,7 @@
   <!-- Horizontal Tabs -->
   <div class="medicine-tabs">
     <ul class="nav nav-tabs">
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <button class="nav-link" [class.active]="activeTab === 'about'" (click)="switchTab('about')" type="button">
           عن القسم
         </button>
@@ -16,12 +16,12 @@
         <button class="nav-link" [class.active]="activeTab === 'details'" (click)="switchTab('details')" type="button">
           تفاصيل القسم
         </button>
-      </li>
-      <li class="nav-item">
+      </li> -->
+      <!-- <li class="nav-item">
         <button class="nav-link" [class.active]="activeTab === 'programs'" (click)="switchTab('programs')" type="button">
           برامج القسم
         </button>
-      </li>
+      </li> -->
       <li class="nav-item">
         <button class="nav-link" [class.active]="activeTab === 'services'" (click)="switchTab('services')" type="button">
           خدمات القسم
@@ -38,10 +38,10 @@
   <!-- Content Area -->
   <div class="row">
     <!-- About Tab Content -->
-    <div *ngIf="activeTab === 'about'" class="col-12">
-      <div class="row">
+    <!-- <div *ngIf="activeTab === 'about'" class="col-12">
+      <div class="row"> -->
         <!-- Sidebar -->
-        <div class="col-md-3 mb-4">
+        <!-- <div class="col-md-3 mb-4">
           <div class="list-group">
             <button type="button" class="list-group-item list-group-item-action"
               [class.active]="activeAboutSection === 'overview'" (click)="switchAboutSection('overview')">
@@ -60,10 +60,10 @@
               الأهداف
             </button>
           </div>
-        </div>
+        </div> -->
 
         <!-- Content -->
-        <div class="col-md-9">
+        <!-- <div class="col-md-9">
           <div class="card">
             <div class="card-body">
               <div *ngIf="activeAboutSection === 'overview'">
@@ -91,23 +91,23 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Details Tab Content -->
-    <div *ngIf="activeTab === 'details'" class="col-12">
+    <!-- <div *ngIf="activeTab === 'details'" class="col-12">
       <div class="card">
         <div class="card-body">
           <h3 class="text-brown mb-3">{{ departmentDetail?.title }}</h3>
           <p class="mb-3">{{ departmentDetail?.content }}</p>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Programs Tab Content -->
-    <div *ngIf="activeTab === 'programs'" class="col-12">
-      <div class="row">
+    <!-- <div *ngIf="activeTab === 'programs'" class="col-12">
+      <div class="row"> -->
         <!-- Sidebar -->
-        <div class="col-md-3 mb-4">
+        <!-- <div class="col-md-3 mb-4">
           <div class="list-group">
             <button type="button" class="list-group-item list-group-item-action"
               *ngFor="let program of departmentPrograms"
@@ -116,10 +116,10 @@
               {{ program.name }}
             </button>
           </div>
-        </div>
+        </div> -->
 
         <!-- Content -->
-        <div class="col-md-9">
+        <!-- <div class="col-md-9">
                  <div class="card" *ngIf="selectedProgram">
                    <div class="card-body">
                      <h3 class="text-brown mb-3">{{ selectedProgram.name }}</h3>
@@ -128,9 +128,9 @@
                      <a [routerLink]="['/programs', selectedProgram.programId]" class="btn btn-medicine">عرض البرنامج</a>
                    </div>
                  </div>
-               </div>
-      </div>
-    </div>
+               </div> -->
+      <!-- </div>
+    </div> -->
 
     <!-- Services Tab Content -->
     <div *ngIf="activeTab === 'services'" class="col-12">
@@ -162,6 +162,9 @@
               </ul>
             </div>
           </div>
+        </div>
+        <div *ngIf="!selectedService">
+          <p>لا توجد معلومات متاحة عن خدمات القسم.</p>
         </div>
       </div>
     </div>
