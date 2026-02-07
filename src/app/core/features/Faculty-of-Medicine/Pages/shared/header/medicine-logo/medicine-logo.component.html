@@ -2,14 +2,15 @@
       <div class="logo-bar-container">
         <!-- Logo Section -->
         <div class="logo-section">
-          <img
-            [src]="logoUrl"
-            [alt]="'Faculty of Medicine Logo'"
-            class="logo-image"
-            (click)="openLocation()"
-            style="cursor: pointer;"
-            *ngIf="logoUrl"
-          >
+          <a routerLink="/home">
+            <img
+              [src]="logoUrl"
+              [alt]="'Faculty of Medicine Logo'"
+              class="logo-image"
+              style="cursor: pointer;"
+              *ngIf="logoUrl"
+            >
+          </a>
           <div class="logo-text">
             <h1 class="logo-title">كلية الطب - جامعة الاقصر </h1>
           </div>
@@ -33,6 +34,12 @@
           <a class="contact-item" *ngIf="contact?.email" (click)="openEmail()">
             <i class="fas fa-envelope"></i>
             <span>{{ contact?.email }}</span>
+          </a>
+
+          <!-- Language -->
+          <a class="contact-item" href="{{ contact?.webSite }}" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-language"></i>
+            <span>EN</span>
           </a>
         </div>
       </div>
